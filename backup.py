@@ -5,27 +5,25 @@ import math
 import random
 
 cl = ColorSensor()
+cl.mode='RGB-RAW'
 
 colorDictionary = {
-  "RED" : [13, 2, 0],
-  "WHITE" : [23, 37, 35],
-  "BLUE" : [0, 3, 7],
-  "GRAY" : [0, 6, 3],
+  "RED" : [6, 0, 0],
+  "WHITE" : [19, 32, 31],
+  "BLUE" : [0, 0, 5],
+  "GRAY" : [0, 0, 0],
   "YELLOW" : [16, 17, 0],
-  "GREEN" : [0, 15, 1]
+  "GREEN" : [0, 15, 1],
+  None : [100, 100, 100],
   }
 
 #Returns the key (name of the color) of the color immediately below the color sensor 
 def getCurrentColor() :
   arr = [cl.value(0), cl.value(1), cl.value(2)]
   asdf = False
-  for key, val in colorDictionary : 
+  for key, val in colorDictionary.items() : 
     if inThree(arr[0], val[0]) and inThree(arr[1], val[1]) and inThree(arr[2], val[2]) :
       return key
-  if asdf == False :
-    print("UNKNOWN COLOR" + str(arr[0]) + ", " + str(arr[1] + ", " + str(arr[2])))
-
-def allInThree()
 
 #helper function
 def inThree(a, b) :
@@ -41,11 +39,11 @@ HEAD_SOUTH = True
 
 MAX_OUTERCOUNT = 6
 MAX_INNERCOUNT = 30
-MIN_SPEED = 100
-MAX_SPEED = 200
+MIN_SPEED = 200
+MAX_SPEED = 300
 DELAY = 0.1
 SLOW_TURN_SPEED = 50
-FAST_TURN_SPEED = 100
+FAST_TURN_SPEED = 150
 TURN_DELAY = 2.5
 ESCAPE_DELAY = 1.5
 CRAWL_SPEED = 100
@@ -53,11 +51,11 @@ WIGGLE_FACTOR = 0.2
 
 hit_first_color = False
 following_line = False
-col = UNKNOWN
-prev_col = UNKNOWN
+col = "UNKNOWN"
+prev_col = "UNKNOWN"
 
-mRt = LargeMotor('outA')
-mLt = LargeMotor('outD')
+mRt = LargeMotor('outB')
+mLt = LargeMotor('outC')
 
 
 #colors=('unknown','black','blue','green','yellow','red','white','brown')
@@ -67,6 +65,7 @@ for outercount in range(MAX_OUTERCOUNT):
     sleep(DELAY)
     prev_col = col
     col = getCurrentColor()
+    print(col)
     print(colorDictionary[col])
 
     # If looking for yellow/green strip to follow 
