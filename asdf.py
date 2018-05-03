@@ -18,9 +18,9 @@ cl = ColorSensor()
 cl.mode='RGB-RAW'
 
 colorDictionary = {
-  "RED" : [6, 0, 0],
+  "RED" : [15, 3, 1],
   "WHITE" : [19, 32, 31],
-  "BLUE" : [0, 0, 5],
+  "BLUE" : [0, 3, 10],
   "GRAY" : [0, 0, 0],
   "YELLOW" : [16, 17, 0],
   "GREEN" : [0, 15, 1],
@@ -56,21 +56,26 @@ def turnRight() :
 #numbers need to be calibrated to individual robots, rotates the robot 180 degrees
 def rotate() :
 	print("rotating")
-	mLt.run_to_rel_pos(position_sp=1070, speed_sp = 200, stop_action = "brake")
+	mLt.run_to_rel_pos(position_sp=1060, speed_sp = 200, stop_action = "brake")
 	print("Left Motor Running")
-	mRt.run_to_rel_pos(position_sp=-1070, speed_sp = 200, stop_action = "brake")
+	mRt.run_to_rel_pos(position_sp=-1060, speed_sp = 200, stop_action = "brake")
 	print("Right motor running")
-	mRt.wait_while('running')
-	mRt.wait_while('running')
 	print("finished rotating")
-	sleep(1)
+	sleep(7)
+
+
+#TODO: elongate flippy prongs
 #TODO: rotate in opposite directions to avoid drifting around the arena
+#TODO: follow line rather than turn. This is somewhat low of a priority
 def run(col) :
+	turnSpeedSlow = 80
+	turnSpeedFast = 160
+	turnRadius = 300
 	inbounds = True
 	print("Starting")
 	mLt.run_forever(speed_sp = -200)
 	mRt.run_forever(speed_sp = -200)
-	while inbounds : 
+	while inbounds : #and touch is not touched?
 		col = getCurrentColor()
 		print(col)
 		if col == "WHITE" :
@@ -78,9 +83,20 @@ def run(col) :
 			mRt.stop()
 			rotate()
 			print("resuming movement")
-			mLt.run_forever(speed_sp = -300)
-			mRt.run_forever(speed_sp = -300)
-		sleep(0.1)
+			mLt.run_forever(speed_sp = -200)
+			mRt.run_forever(speed_sp = -200)
+		elif col == "BLUE" :
+			mRt.stop()
+			mLt.stop()
+			mRt.run_to_rel_pos(position_sp = turnRadius, speed_sp = turnSpeedFast)
+			mLt.run_to_rel_pos(position_sp = -turnRadius, speed_sp = turnSpeedFast)
+		elif col == "GRAY" or col == None :
+			mRt.stop()
+			mLt.stop()
+			mRt.run_to_rel_pos(position_sp = -turnRadius, speed_sp = turnSpeedFast)
+			mLt.run_to_rel_pos(position_sp = turnRadius, speed_sp = turnSpeedFast)
+
+		sleep(0.05)
 
 col = getCurrentColor()
 run(col)
