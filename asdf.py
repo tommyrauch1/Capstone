@@ -18,10 +18,10 @@ cl = ColorSensor()
 cl.mode='RGB-RAW'
 
 colorDictionary = {
-  "RED" : [15, 3, 1],
-  "WHITE" : [19, 32, 31],
-  "BLUE" : [0, 3, 10],
-  "GRAY" : [0, 0, 0],
+  "RED" : [34, 7, 7],
+  "WHITE" : [56, 76, 68],
+  "BLUE" : [3, 10, 20],
+  "GRAY" : [9, 14, 11],
   "YELLOW" : [16, 17, 0],
   "GREEN" : [0, 15, 1],
   None : [0, 0, 0],
@@ -63,19 +63,43 @@ def rotate() :
 	print("finished rotating")
 	sleep(7)
 
+def whenBlue(turnRadius, turnSpeed) :
+	mRt.stop()
+	mLt.stop()
+	mRt.run_to_rel_pos(position_sp = -turnRadius, speed_sp = turnSpeed)
+	mLt.run_to_rel_pos(position_sp = turnRadius, speed_sp = turnSpeed)
+	sleep(3)
+
+def whenGray(turnRadius, turnSpeed) :
+	mRt.stop()
+	mLt.stop()
+	mRt.run_to_rel_pos(position_sp = turnRadius, speed_sp = turnSpeed)
+	mLt.run_to_rel_pos(position_sp = -turnRadius, speed_sp = turnSpeed)
+	sleep(3)
+
+def whenRed(turnRadius, turnSpeed) : 
+	mRt.stop()
+	mLt.stop()
+	mRt.run_to_rel_pos(position_sp = -turnRadius, speed_sp = turnSpeed)
+	mLt.run_to_rel_pos(position_sp = turnRadius, speed_sp = turnSpeed)
+	sleep(3)
+
 
 #TODO: elongate flippy prongs
 #TODO: rotate in opposite directions to avoid drifting around the arena
 #TODO: follow line rather than turn. This is somewhat low of a priority
+#Start with blue on the right and gray on the left, dirFlag is 0
+#Move faster, and reduce sleep times
 def run(col) :
 	turnSpeedSlow = 80
 	turnSpeedFast = 160
-	turnRadius = 300
+	turnRadius = 130
 	inbounds = True
+	dirFlag = 0
 	print("Starting")
-	mLt.run_forever(speed_sp = -200)
-	mRt.run_forever(speed_sp = -200)
 	while inbounds : #and touch is not touched?
+		mLt.run_forever(speed_sp = -200)
+		mRt.run_forever(speed_sp = -200)
 		col = getCurrentColor()
 		print(col)
 		if col == "WHITE" :
@@ -85,18 +109,28 @@ def run(col) :
 			print("resuming movement")
 			mLt.run_forever(speed_sp = -200)
 			mRt.run_forever(speed_sp = -200)
-		elif col == "BLUE" :
-			mRt.stop()
-			mLt.stop()
-			mRt.run_to_rel_pos(position_sp = turnRadius, speed_sp = turnSpeedFast)
-			mLt.run_to_rel_pos(position_sp = -turnRadius, speed_sp = turnSpeedFast)
-		elif col == "GRAY" or col == None :
-			mRt.stop()
-			mLt.stop()
-			mRt.run_to_rel_pos(position_sp = -turnRadius, speed_sp = turnSpeedFast)
-			mLt.run_to_rel_pos(position_sp = turnRadius, speed_sp = turnSpeedFast)
+			turnSpeedFast *= -1
+			turnSpeedSlow *= -1
+			if dirFlag == 0 :
+				dirFlag = 1
+			else :
+				dirFlag = 0
+
+		elif col == "BLUE" and dirFlag == 0 :
+			whenBlue(turnRadius, turnSpeedFast)
+
+		elif col == "RED" and dirFlag == 1 :
+			whenRed(turnRadius, turnSpeedFast)
+
+		elif col == "GRAY" :
+			if dirFlag == 0 :
+				whenGray(turnRadius, turnSpeedFast)
+			else :
+				whenGray(turnRadius, -turnSpeedFast)
 
 		sleep(0.05)
+
+
 
 col = getCurrentColor()
 run(col)
