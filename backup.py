@@ -14,7 +14,7 @@ colorDictionary = {
   "GRAY" : [0, 0, 0],
   "YELLOW" : [16, 17, 0],
   "GREEN" : [0, 15, 1],
-  None : [100, 100, 100],
+  None : [0, 0, 0],
   }
 
 #Returns the key (name of the color) of the color immediately below the color sensor 
@@ -88,8 +88,8 @@ for outercount in range(MAX_OUTERCOUNT):
               sign = -1
             else:
               sign = 1
-            mRt.run_forever(speed_sp=  sign * SLOW_TURN_SPEED)
-            mLt.run_forever(speed_sp= -sign * SLOW_TURN_SPEED)
+            mRt.run_forever(speed_sp=  1.5 * sign * SLOW_TURN_SPEED)
+            mLt.run_forever(speed_sp= -1.5*sign * SLOW_TURN_SPEED)
             while prev_col == col:
               sleep(DELAY)
               col = getCurrentColor()

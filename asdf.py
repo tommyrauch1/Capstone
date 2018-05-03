@@ -5,7 +5,7 @@ import math
 import random
 
 
-
+#chmod 777 *
 #stay in bounds done
 #see ball 
 #grab ball
@@ -24,7 +24,7 @@ colorDictionary = {
   "GRAY" : [0, 0, 0],
   "YELLOW" : [16, 17, 0],
   "GREEN" : [0, 15, 1],
-  None : [100, 100, 100],
+  None : [0, 0, 0],
   }
 
 #Returns the key (name of the color) of the color immediately below the color sensor 
@@ -52,12 +52,35 @@ def turnRight() :
 	mLt.stop()
 	mRt.run_to_rel_pos(position_sp=900, speed_sp = 200, stop_action = "brake")
 	sleep(1000)
-	
 
-inBounds = True
+#numbers need to be calibrated to individual robots, rotates the robot 180 degrees
+def rotate() :
+	print("rotating")
+	mLt.run_to_rel_pos(position_sp=1070, speed_sp = 200, stop_action = "brake")
+	print("Left Motor Running")
+	mRt.run_to_rel_pos(position_sp=-1070, speed_sp = 200, stop_action = "brake")
+	print("Right motor running")
+	mRt.wait_while('running')
+	mRt.wait_while('running')
+	print("finished rotating")
+	sleep(1)
+#TODO: rotate in opposite directions to avoid drifting around the arena
+def run(col) :
+	inbounds = True
+	print("Starting")
+	mLt.run_forever(speed_sp = -200)
+	mRt.run_forever(speed_sp = -200)
+	while inbounds : 
+		col = getCurrentColor()
+		print(col)
+		if col == "WHITE" :
+			mLt.stop()
+			mRt.stop()
+			rotate()
+			print("resuming movement")
+			mLt.run_forever(speed_sp = -300)
+			mRt.run_forever(speed_sp = -300)
+		sleep(0.1)
 
-for x in range(0,100) :
-	if(inBounds == False) :
-		turnRight()
-	mRt.run_timed(time_sp = 1000, speed_sp = 500)
-	mLt.run_timed(time_sp = 1000, speed_sp = 500)
+col = getCurrentColor()
+run(col)
