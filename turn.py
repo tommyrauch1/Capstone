@@ -14,5 +14,13 @@ import random
 mRt = LargeMotor('outB')
 mLt = LargeMotor('outC')
 
-mLt.run_to_rel_pos(position_sp=1070, speed_sp = 200, stop_action = "brake")
-mRt.run_to_rel_pos(position_sp=-1070, speed_sp = 200, stop_action = "brake")
+print("FORWARDS")
+mLt.run_forever(speed_sp=100)
+mRt.run_forever(speed_sp=100)
+sleep(2)
+
+mLt.stop()
+mRt.stop()
+
+mLt.run_forever(speed_sp=-100)
+mRt.run_forever(speed_sp=-100)

@@ -1,60 +1,30 @@
 #!/usr/bin/env python3
 from ev3dev.ev3 import *
+from time import sleep
 
-global WHITE #59 78 63
-global RED #38 8 3
-global BLUE #2 8 16
+mRt = LargeMotor('outB')
+mLt = LargeMotor('outC')
+mFlip = LargeMotor('outA')
 
-RED = [38, 8, 3]
-WHITE = [59, 78, 63]
-BLUE = [2, 8, 16]
-
-
-cl = ColorSensor()
-cl.mode='RGB-RAW'
-
-leftMotor = LargeMotor('outC')
-rightMotor = LargeMotor('outB')
-
-def run() :
-	print("Back to run")
-	if cl.value(0) <45 and cl.value(0) > 30:
-		ifBlue()
-	elif cl.value(0) >50 and cl.value(0) < 65:
-		ifWhite()
-	else:
-		ifRed()
-
-def printValues():
-	red = cl.value(0)
-	green = cl.value(1)
-	blue = cl.value(2)
-	print("Red: " + str(red))
-	print("Green: " + str(green))
-	print("Blue: " + str(blue))
-
-def ifRed():
-	print("ifRed")
-	printValues()
-	leftMotor.run_timed(time_sp = 1000, speed_sp = -400)
-	rightMotor.run_timed(time_sp = 1000, speed_sp = -400)
-	leftMotor.wait_while('running')
-	rightMotor.wait_while('running')
-	run()
-
-def ifBlue():
-	print("ifBlue")
-	printValues()
-	rightMotor.run_to_rel_pos(position_sp=90, speed_sp = -400, stop_action = "brake")
-	rightMotor.wait_while('running')
-	run()
-
-def ifWhite():	
-	print("ifWhite")
-	printValues()
-	leftMotor.run_to_rel_pos(position_sp=90, speed_sp = -400, stop_action = "brake")
-	leftMotor.wait_while('running')
-	run()
-
-run()
-
+mRt.stop()
+mLt.stop()
+mFlip.stop()
+mFlip.run_to_rel_pos(position_sp = -80, speed_sp = 700, stop_action = "hold")
+print("FORWARDS")
+mRt.run_timed(time_sp = 5000, speed_sp = -1000)
+mLt.run_timed(time_sp = 5000, speed_sp = -1000)
+print("WAITING")
+mRt.wait_while('running')
+mLt.wait_while('running')
+#print(" ")
+#sleep(10)
+#mRt.stop(stop_action="brake")
+#mLt.stop(stop_action="brake")
+print("BACKWARDS")
+mRt.run_timed(time_sp = 5000, speed_sp = 1000)
+mLt.run_timed(time_sp = 5000, speed_sp = 1000)
+#mRt.stop(stop_action="brake")
+#mLt.stop(stop_action="brake")
+#mFlip.stop(stop_action="brake")
+#print("STOPPED")
+#sleep(6)

@@ -6,6 +6,8 @@ from time import sleep
 
 RIGHT_MOTOR  = LargeMotor('outB')
 LEFT_MOTOR   = LargeMotor('outC')
+mFlip = LargeMotor('outA')
 
 RIGHT_MOTOR.stop(stop_action='brake')
 LEFT_MOTOR.stop(stop_action='brake')
+mFlip.stop(stop_action='brake')
