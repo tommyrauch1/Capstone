@@ -65,7 +65,7 @@ def inThree(a, b) :
     return True
   return False
 
-def closeClaw():
+def closeClaw(speed, rotSpeed):
         mD=LargeMotor('outD')
         print(c2.value(0))
         if c2.value(0) > 100:
@@ -77,12 +77,17 @@ def closeClaw():
         print(c2.value(0))
         #print(c2.value(1))
         #print(c2.value(2))
-        if c2.value() < 150:
-                openClaw()
+        if not verifyBall:
+            openClaw()
+
+        else :
+        	findGreen(speed, rotSpeed)
+
 def openClaw():
         mD=LargeMotor('outD')
         mD.run_timed(time_sp=350,speed_sp=250)
         mD.wait_while('running')
+        search()
 
 #returns random number of degrees to rotate
 def getRotation() :
@@ -90,11 +95,14 @@ def getRotation() :
 	degrees = degreesToEngineDegrees(n)
 	return degrees
 
+#calculates how many degrees the engines must rotate for the robot to rotate n degrees
 def degreesToEngineDegrees(n) :
 	degrees = n * engineDegreesPerRobotDegrees
 	return degrees
 
 def rotate(turnSpeed, dist) :
+	mRt.stop()
+	mLt.stop()
 	mRt.run_to_rel_pos(position_sp = dist, speed_sp = turnSpeed, stop_action='brake')
 	mLt.run_to_rel_pos(position_sp = (dist * -1), speed_sp = turnSpeed, stop_action = 'brake')
 
@@ -128,10 +136,12 @@ def whenGray(turnRadius, turnSpeed) :
 	mLt.run_to_rel_pos(position_sp = turnRadius, speed_sp = turnSpeed, stop_action = "brake")
 	sleep(1)
 
+#Search for the ball
 def search(speed, rotSpeed) :
+	print("searching")
 	mRt.run_forever(speed_sp = speed)
 	mLt.run_forever(speed_sp = speed)
-	while getCurrentColor(2) not "BALL3" or "BALL2" or "BALL1" :
+	while getCurrentColor(2) != "BALL3" and getCurrentColor(2) != "BALL2" and getCurrentColor(2) != "BALL1" :
 		col = getCurrentColor(1)
 		print(col)
 		if col == "BLUE" or col == "WHITE" :
@@ -142,6 +152,25 @@ def search(speed, rotSpeed) :
 		mRt.run_forever(speed_sp = speed)
 		mLt.run_forever(speed_sp = speed)
 		sleep(0.1)
+	closeClaw()
+
+#find the green line to retreat
+def findGreen(speed, rotSpeed) :
+	print("finding green")
+	mRt.stop()
+	mLt.stop()
+	while getCurrentColor(1) != "GREEN" :
+		col = getCurrentColor(1)
+		mRt.run_forever(speed_sp = speed	)
+		mLt.run_forever(speed_sp = speed)
+		print(col)
+		if col == "BLUE" or col == "WHITE" :
+			numDegrees = getRotation()
+			rotate(rotSpeed, numDegrees)
+		elif col == "GREEN" :
+			mRt.stop()
+			mLt.stop()
+			retreat(speed, rotSpeed)
 	retreat(speed, rotSpeed)
 
 def retreat(speed, rotSpeed) :
