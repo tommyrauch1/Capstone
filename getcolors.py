@@ -5,7 +5,7 @@ import math
 from time import sleep
 
 
-c1 = ColorSensor('in2')
+c1 = ColorSensor('in1')
 c1.mode='RGB-RAW'
 c2 = ColorSensor('in3')
 c2.mode='RGB-RAW'
