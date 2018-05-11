@@ -12,6 +12,10 @@ c1.mode='RGB-RAW'
 mRt = LargeMotor('outA')
 mLt = LargeMotor('outC')
 
+assert c1.connected, "Color sensor 1 not connected"
+assert mRt.connected, "Right motor not connected"
+assert mLt.connected, "Left motor not connected"
+
 colorDictionary = {
   "RED" : [146, 23, 32],
   #"RED_ALT" : [71, 17, 13],
@@ -56,7 +60,7 @@ def inThree(a, b) :
 def closeClaw(speed, rotSpeed, c2):
 		mD=LargeMotor('outD')
 		#print(c2.value(0))
-		mD.run_timed(time_sp=250, speed_sp=-250, stop_action = 'hold')
+		mD.run_timed(time_sp=325, speed_sp=-250, stop_action = 'hold')
 		mD.wait_while('running')
 		time.sleep(4)
 		#print(c2.value(0))
@@ -70,13 +74,13 @@ def closeClaw(speed, rotSpeed, c2):
 
 def openClaw():
 		mD=LargeMotor('outD')
-		mD.run_timed(time_sp=350,speed_sp=250)
+		mD.run_timed(time_sp=400,speed_sp=250)
 		mD.wait_while('running')
 		search()
 
 #returns random number of degrees to rotate
 def getRotation() :
-	n = random.randint(35, 180)
+	n = random.randint(35, 150)
 	degrees = degreesToEngineDegrees(n)
 	return degrees
 
@@ -105,16 +109,16 @@ def rotate(turnSpeed, dist) :
 	# print(str(dist))
 	# mRt.run_to_rel_pos(position_sp = dist, speed_sp = turnSpeed, stop_action='brake')
 	#mLt.run_to_rel_pos(position_sp = (dist * -1), speed_sp = turnSpeed, stop_action = 'brake')
-	mRt.stop(stop_action="brake")
-	mLt.stop(stop_action="brake")
-	print("rotating")
+	#mRt.stop(stop_action="brake")
+	#mLt.stop(stop_action="brake")
+	print("rotating " + str(dist))
 	mRt.run_to_rel_pos(position_sp=dist, speed_sp = turnSpeed, stop_action = "brake")
 	mLt.run_to_rel_pos(position_sp=-dist, speed_sp = turnSpeed, stop_action = "brake")
-	print("Right motor running")
+	sleep(1)
 	print("finished rotating")
-	sleep(6)
 
 def verifyBall(c2) :
+	c2.mode = 'RGB-RAW'
 	col = c2.value(0)
 	if col > 150 :
 		print("Verified")
@@ -132,18 +136,16 @@ def whenRed() :
 
 #used in retreat function
 def whenYellow(turnRadius, turnSpeed) :
-	turnRadius = 150
 	mRt.stop(stop_action="brake")
 	mLt.stop(stop_action="brake")
-	rotate(turnSpeed, 30)
+	rotate(turnSpeed, -60)
 	sleep(1)
 
 #used in retreat function
 def whenGray(turnRadius, turnSpeed) :
-	turnRadius = 150
 	mRt.stop(stop_action="brake")
 	mLt.stop(stop_action="brake")
-	rotate(turnSpeed, -30)
+	rotate(turnSpeed, 60)
 	sleep(1)
 
 #Search for the ball
@@ -162,7 +164,7 @@ def search(speed, rotSpeed) :
 			mRt.stop(stop_action='brake')
 			mLt.stop(stop_action='brake')
 			reverse()
-			degrees = degreesToEngineDegrees(80)
+			degrees = getRotation()
 			rotate(rotSpeed, degrees)
 		mRt.run_forever(speed_sp = speed)
 		mLt.run_forever(speed_sp = speed)
@@ -172,6 +174,9 @@ def search(speed, rotSpeed) :
 #find the green line to retreat
 def findGreen(speed, rotSpeed) :
 	print("finding green")
+	if not verifyBall(c2 = ColorSensor('in3')) :
+		openClaw()
+		search()
 	mRt.stop()
 	mLt.stop()
 	while getCurrentColor(1) != "GREEN" :
@@ -183,7 +188,7 @@ def findGreen(speed, rotSpeed) :
 			mRt.stop(stop_action='brake')
 			mLt.stop(stop_action='brake')
 			reverse()
-			degrees = degreesToEngineDegrees(80)
+			degrees = getRotation()
 			rotate(rotSpeed, degrees)
 		sleep(0.1)
 	mRt.stop()
@@ -194,17 +199,17 @@ def retreat(speed, rotSpeed) :
 	print("Retreating")
 	inbounds = True
 	while inbounds:
-		mLt.run_forever(speed_sp = -350)
-		mRt.run_forever(speed_sp = -350)
+		mLt.run_forever(speed_sp = speed)
+		mRt.run_forever(speed_sp = speed)
 		col = getCurrentColor(1)
 		print(col)
 		if col == "WHITE" :
 			#mRt.stop(stop_action='brake')
 			#mLt.stop(stop_action='brake')
 			#reverse()
-			numDegrees = 250
+			numDegrees = 180
 			rotate(rotSpeed, numDegrees)
-		elif col == "YELLOW":
+		elif col == "YELLOW" or col == "YELLOW_ALT":
 			#mRt.stop(stop_action='brake')
 			#mLt.stop(stop_action='brake')
 			whenYellow(250, rotSpeed)
@@ -237,10 +242,9 @@ def run(speed, rotSpeed) :
 	# 	sleep(0.1)
 	mRt.wait_while('running')
 	mLt.wait_while('running')
-	sleep(10)
-	print("sleeping engines")
 	search(speed, rotSpeed)
 
-driveSpeed = 200
-rotationSpeed = 70
-retreat(150, rotationSpeed) 
+if __name__ == "__main__":
+	driveSpeed = 200
+	rotationSpeed = 90
+run(200, rotationSpeed) 
