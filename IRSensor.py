@@ -8,16 +8,17 @@ def Scan():
 	eyeMotor = LargeMotor('outC')
 	objectSpotted = False
 	dir = 175
+	eyeMotor.run_to_rel_pos(position_sp=dir, speed_sp=75, stop_action="brake")
 	while(objectSpotted == False):
 		eyeMotor.stop()
-		eyeMotor.run_to_rel_pos(position_sp=dir, speed_sp=75, stop_action="brake")
 		distance = ir.value()
 		if(ir.value() < 30):
 			objectSpotted = True
 			eyeMotor.stop()
 			print("spotted")
 		dir *= -1
-		eyeMotor.wait_while('running')
+		sleep(0.1)
+	Scan()
 
 def Slap():
 	slapMotor = LargeMotor('outA')
@@ -25,9 +26,6 @@ def Slap():
 	slapMotor.wait_while('running')
 	slapMotor.run_to_rel_pos(position_sp=-180, speed_sp=1000, stop_action="hold")
 
-#scanThread = Thread(target=Scan)
-#slapThread = Thread(target=Slap)
-#scanThread.start()
 global objectSpotted
 objectSpotted = False
 while(objectSpotted == False) :
