@@ -1,2 +1,2 @@
 # Capstone
-Senior capstone project by Tommy Tommy and Noah
+Senior capstone project
